@@ -1,11 +1,11 @@
-const postsResolvers = require("./posts");
-const usersResolvers = require("./users");
+import { Query } from "./posts";
+import { Mutation } from "./users";
 
-module.exports = {
-    Query: {
-        ...postsResolvers.Query,
-    },
-    Mutation: {
-        ...usersResolvers.Mutation,
-    }
-}
+export default {
+  Query: {
+    ...Query,
+  },
+  Mutation: {
+    ...Mutation,
+  },
+};

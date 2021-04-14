@@ -1,22 +1,25 @@
-const { ApolloServer } = require("apollo-server");
-// import { ApolloServer } from "apollo-server";
-const mongoose = require("mongoose");
+import { ApolloServer } from "apollo-server";
+import mongoose from "mongoose";
 
-const typeDefs = require("./graphql/typeDefs");
-const resolvers = require("./graphql/resolvers/index");
-const { MONGODB } = require("./config.js");
+import typeDefs from "./graphql/typeDefs";
+import resolvers from "./graphql/resolvers/index";
+import { MONGODB } from "./config";
 
 const server = new ApolloServer({
   typeDefs,
   resolvers,
 });
 
-mongoose
-  .connect(MONGODB, { useNewUrlParser: true })
-  .then(() => {
+const connectDB = async () => {
+  try {
+    await mongoose.connect(MONGODB, { useNewUrlParser: true });
     console.log("MongoDB connected");
-    return server.listen({ port: 5000 });
-  })
-  .then((res) => {
+
+    const res = await server.listen({ port: 5000 });
     console.log(`Server running at ${res.url}`);
-  });
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+connectDB();

@@ -1,4 +1,4 @@
-module.exports.validateRegisterInput = ({
+const validateRegisterInput = ({
   username,
   email,
   password,
@@ -32,7 +32,7 @@ module.exports.validateRegisterInput = ({
   };
 };
 
-module.exports.validateLoginInput = (username, password) => {
+const validateLoginInput = (username, password) => {
   const errors = {};
 
   if (username.trim() === "") {
@@ -44,4 +44,10 @@ module.exports.validateLoginInput = (username, password) => {
   }
 
   return { errors };
+};
+
+
+export {
+  validateRegisterInput,
+  validateLoginInput,
 };

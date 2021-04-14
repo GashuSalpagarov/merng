@@ -1,16 +1,16 @@
-const bcrypt = require("bcryptjs");
-const jwt = require("jsonwebtoken");
-const { UserInputError } = require("apollo-server");
+import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
+import { UserInputError } from "apollo-server";
 
-const {
+import {
   validateRegisterInput,
   validateLoginInput,
-} = require("../../util/validators");
-const { SECRET_KEY } = require("../../config");
-const User = require("../../models/User");
+} from "../../util/validators";
+import { SECRET_KEY } from "../../config";
+import User from "../../models/User";
 
-function generateToken(user) {
-  return jwt.sign(
+const generateToken = (user) =>
+  jwt.sign(
     {
       id: user.id,
       email: user.email,
@@ -19,78 +19,77 @@ function generateToken(user) {
     SECRET_KEY,
     { expiresIn: "1hr" }
   );
-}
 
-module.exports = {
-  Mutation: {
-    async login(_, { username, password }) {
-      const { errors, valid } = validateLoginInput(username, password);
-      const user = await User.findOne({ username });
+const Mutation = {
+  async login(_, { username, password }) {
+    const { errors, valid } = validateLoginInput(username, password);
+    const user = await User.findOne({ username });
 
-      if (!user) {
-        errors.general = "User not found";
-        throw new UserInputError("User not found", { errors });
-      }
+    if (!user) {
+      errors.general = "User not found";
+      throw new UserInputError("User not found", { errors });
+    }
 
-      const match = await bcrypt.compare(password, user.password);
-      if (!match) {
-        errors.general = "Wrong credentials";
-        throw new UserInputError("Wrong credentials", { errors });
-      }
+    const match = await bcrypt.compare(password, user.password);
+    if (!match) {
+      errors.general = "Wrong credentials";
+      throw new UserInputError("Wrong credentials", { errors });
+    }
 
-      const token = generateToken(user);
+    const token = generateToken(user);
 
-      return {
-        ...user._doc,
-        id: user._id,
-        token,
-      };
-    },
-    async register(
-      _,
-      { registerInput: { username, email, password, confirmPassword } }
-    ) {
-      // Validate user data
-      const { valid, errors } = validateRegisterInput({
-        username,
-        email,
-        password,
-        confirmPassword,
+    return {
+      ...user._doc,
+      id: user._id,
+      token,
+    };
+  },
+  async register(
+    _,
+    { registerInput: { username, email, password, confirmPassword } }
+  ) {
+    // Validate user data
+    const { valid, errors } = validateRegisterInput({
+      username,
+      email,
+      password,
+      confirmPassword,
+    });
+
+    if (!valid) {
+      throw new UserInputError("Errors", { errors });
+    }
+
+    // Make sure user doesnt already exist
+    const user = await User.findOne({ username });
+    if (user) {
+      throw new UserInputError("Username is taken", {
+        errors: {
+          username: "This username is taken",
+        },
       });
+    }
+    // hash password and create an auth token
 
-      if (!valid) {
-        throw new UserInputError("Errors", { errors });
-      }
+    password = await bcrypt.hash(password, 12);
 
-      // Make sure user doesnt already exist
-      const user = await User.findOne({ username });
-      if (user) {
-        throw new UserInputError("Username is taken", {
-          errors: {
-            username: "This username is taken",
-          },
-        });
-      }
-      // hash password and create an auth token
+    const newUser = new User({
+      email,
+      username,
+      password,
+      createdAt: new Date().toISOString(),
+    });
 
-      password = await bcrypt.hash(password, 12);
+    const res = await newUser.save();
 
-      const newUser = new User({
-        email,
-        username,
-        password,
-        createdAt: new Date().toISOString(),
-      });
+    const token = generateToken(res);
 
-      const res = await newUser.save();
-
-      const token = generateToken(res);
-
-      return {
-        ...res._doc,
-        id: res._id,
-        token,
-      };
-    },
+    return {
+      ...res._doc,
+      id: res._id,
+      token,
+    };
   },
 };
+
+export { Mutation };

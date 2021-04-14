@@ -1,6 +1,6 @@
-const Post = require("../../models/Post");
+import Post from "../../models/Post";
 
-module.exports = {
+export default {
   Query: {
     async getPosts() {
       try {
