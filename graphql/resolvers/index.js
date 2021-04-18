@@ -1,11 +1,13 @@
-import { Query } from "./posts";
-import { Mutation } from "./users";
+import postResolvers from "./posts";
+import userResolvers from "./users";
 
 export default {
   Query: {
-    ...Query,
+    ...userResolvers.Query,
+    ...postResolvers.Query,
   },
   Mutation: {
-    ...Mutation,
+    ...userResolvers.Mutation,
+    ...postResolvers.Mutation,
   },
 };

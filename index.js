@@ -8,6 +8,7 @@ import { MONGODB } from "./config";
 const server = new ApolloServer({
   typeDefs,
   resolvers,
+  context: ({ req }) => ({ req }),
 });
 
 const connectDB = async () => {
