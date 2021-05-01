@@ -1,13 +1,21 @@
-import postResolvers from "./posts";
-import userResolvers from "./users";
+import usersResolvers from "./users";
+import postsResolvers from "./posts";
+import commentsResolvers from "./comments";
 
 export default {
+  Post: {
+    commentCount: (parent) => parent.comments.length,
+    likeCount: (parent) => parent.likes.length,
+  },
   Query: {
-    ...userResolvers.Query,
-    ...postResolvers.Query,
+    ...postsResolvers.Query,
   },
   Mutation: {
-    ...userResolvers.Mutation,
-    ...postResolvers.Mutation,
+    ...usersResolvers.Mutation,
+    ...postsResolvers.Mutation,
+    ...commentsResolvers.Mutation,
+  },
+  Subscription: {
+    ...postsResolvers.Subscription,
   },
 };

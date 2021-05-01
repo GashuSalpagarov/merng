@@ -1,14 +1,15 @@
-import { ApolloServer } from "apollo-server";
+import { ApolloServer, PubSub } from "apollo-server";
 import mongoose from "mongoose";
 
 import typeDefs from "./graphql/typeDefs";
 import resolvers from "./graphql/resolvers/index";
 import { MONGODB } from "./config";
 
+const pubsub = new PubSub();
 const server = new ApolloServer({
   typeDefs,
   resolvers,
-  context: ({ req }) => ({ req }),
+  context: ({ req }) => ({ req, pubsub }),
 });
 
 const connectDB = async () => {
