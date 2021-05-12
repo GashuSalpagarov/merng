@@ -33,7 +33,6 @@ function PostCard({
         <Button as="div" labelPosition="right" onClick={likePost}>
           <Button color="teal" basic>
             <Icon name="heart" />
-            Like
           </Button>
           <Label basic color="teal" pointing="left">
             {likeCount}
@@ -42,7 +41,6 @@ function PostCard({
         <Button as="div" labelPosition="right" onClick={commentPost}>
           <Button color="blue" basic>
             <Icon name="comments" />
-            Comment
           </Button>
           <Label basic color="blue" pointing="left">
             {commentCount}

@@ -23,6 +23,11 @@ const generateToken = (user) =>
 const Mutation = {
   async login(_, { username, password }) {
     const { errors, valid } = validateLoginInput(username, password);
+    
+    if (!valid) {
+      throw new UserInputError("Errors", { errors });
+    }
+    
     const user = await User.findOne({ username });
 
     if (!user) {
