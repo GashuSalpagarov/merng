@@ -1,44 +1,35 @@
-import React from "react";
-import { Card, Icon, Label, Image, Button } from "semantic-ui-react";
+import React, { useContext } from "react";
 import { Link } from "react-router-dom";
+import { Card, Icon, Label, Image, Button } from "semantic-ui-react";
 import moment from "moment";
 // import 'moment/locale/ru'
 // moment.locale("ru");
 
+import { AuthContext } from "../context/auth";
+
+import PostLikeButton from "../components/PostLikeButton";
+import PostDeleteButton from "../components/PostDeleteButton";
+
 function PostCard({
   post: { body, createdAt, id, username, likeCount, commentCount, likes },
 }) {
-  const likePost = () => {
-    console.log('like post')
-  };
-  const commentPost = () => {
-    console.log('comment post')
-  };
+  const { user } = useContext(AuthContext);
 
   return (
-    <Card>
-      <Card.Content>
+    <Card style={{ width: "100%" }}>
+      <Card.Content as={Link} to={`/posts/${id}`} title="Go to post page">
         <Image
           floated="right"
           size="mini"
           src="https://react.semantic-ui.com/images/avatar/large/jenny.jpg"
         />
         <Card.Header>{username}</Card.Header>
-        <Card.Meta as={Link} to={`/posts/${id}`}>
-          {moment(createdAt).fromNow()}
-        </Card.Meta>
+        <Card.Meta>{moment(createdAt).fromNow()}</Card.Meta>
         <Card.Description>{body}</Card.Description>
       </Card.Content>
       <Card.Content extra>
-        <Button as="div" labelPosition="right" onClick={likePost}>
-          <Button color="teal" basic>
-            <Icon name="heart" />
-          </Button>
-          <Label basic color="teal" pointing="left">
-            {likeCount}
-          </Label>
-        </Button>
-        <Button as="div" labelPosition="right" onClick={commentPost}>
+        <PostLikeButton post={{ id, likes, likeCount, user }} />
+        <Button labelPosition="right" as={Link} to={`/posts/${id}`}>
           <Button color="blue" basic>
             <Icon name="comments" />
           </Button>
@@ -46,6 +37,8 @@ function PostCard({
             {commentCount}
           </Label>
         </Button>
+
+        {user && user.username === username && <PostDeleteButton postId={id} />}
       </Card.Content>
     </Card>
   );

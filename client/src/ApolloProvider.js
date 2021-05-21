@@ -6,7 +6,7 @@ import {
   createHttpLink,
   ApolloProvider,
 } from "@apollo/client";
-import { setContext } from '@apollo/client/link/context';
+import { setContext } from "@apollo/client/link/context";
 
 const httpLink = createHttpLink({
   uri: "http://localhost:5000",
@@ -23,7 +23,27 @@ const authLink = setContext(() => {
 
 const client = new ApolloClient({
   link: authLink.concat(httpLink),
-  cache: new InMemoryCache(),
+  cache: new InMemoryCache({
+    typePolicies: {
+      Query: {
+        fields: {
+          getPosts: {
+            merge: false,
+          },
+        },
+      },
+      Post: {
+        fields: {
+          likes: {
+            merge: false,
+          },
+          comments: {
+            merge: false,
+          },
+        },
+      },
+    },
+  }),
 });
 
 const ApolloProviderComponent = () => {
